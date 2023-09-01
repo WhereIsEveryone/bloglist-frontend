@@ -1,7 +1,48 @@
-const Blog = ({ blog }) => (
-  <div>
-    {blog.title} | {blog.author} | Likes {blog.likes} | {blog.url}
-  </div>  
-)
+import { useState } from 'react'
+
+const Blog = ({ blog, user, updater, remover }) => {
+  console.log(blog)
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    paddingRight: 5,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5
+  }
+
+  const [showAll, setShowAll] = useState(false)
+
+  const updateBlog = () => {
+    const updatedBlog = { ...blog, likes: blog.likes + 1 }
+    updater(blog.id, updatedBlog)
+  }
+
+  const removeBlog = () => {
+    if (window.confirm(`Poista ${blog.title}?`)) {
+      remover(blog.id)
+    }
+  }
+
+  if (!showAll) {
+    return (
+      <div style={blogStyle}>
+        {blog.title} <button onClick={() => setShowAll(true)}>Laajenna</button>
+      </div>
+    )
+  }
+  else {
+    return (
+      <div style={blogStyle}>
+        {blog.title} <button onClick={() => setShowAll(false)}>Piilota</button> <br />
+        {blog.author} <br />
+        Likes {blog.likes} <button onClick={updateBlog}>Tykkää</button> <br />
+        {blog.url} <br />
+        {blog.user ? blog.user.name : 'Tuntematon'} <br />
+        {blog.user && blog.user.name === user.name && <button onClick={removeBlog}>Poista</button> }
+      </div>
+    )
+  }
+}
 
 export default Blog

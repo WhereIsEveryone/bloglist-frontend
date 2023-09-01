@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState(null) 
-  const [password, setPassword] = useState(null)
+  const [username, setUsername] = useState('') 
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [newTitle, setNewTitle] = useState(null)
-  const [newAuthor, setNewAuthor] = useState(null)
-  const [newUrl, setNewUrl] = useState(null)
   const [notificationMsg, setNotificationMsg] = useState({message: null, success: null})
 
   useEffect(() => {
@@ -40,8 +39,8 @@ const App = () => {
       )
       setUser(user)
       blogService.setToken(user.token)
-      setUsername(null)
-      setPassword(null)
+      setUsername('')
+      setPassword('')
       setNotificationMsg( {message: `Henkilö ${user.name} kirjattu sisään`, success: true} )
       timeOut()
     } catch (exception) {
@@ -74,34 +73,12 @@ const App = () => {
     </form>      
   )
 
-  const blogForm = (handleSubmit) => {
-    return (
-        <form style={{marginTop: 20}} onSubmit={handleSubmit}>
-          <div>
-            Title: <input value={newTitle} onChange={({ target }) => setNewTitle(target.value)} /> <br />
-            Author: <input value={newAuthor} onChange={({ target }) => setNewAuthor(target.value)} /> <br />
-            Url: <input value={newUrl} onChange={({ target }) => setNewUrl(target.value)} /> <br />
-            <button type="submit">Lisää</button>
-          </div>
-        </form>
-    )
-  }
-
-  const addBlog = (event) => {
-    event.preventDefault()
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
+  const addBlog = (blogObject) => {
     blogService
         .create(blogObject)
         .then(returnedBlog => {
           setBlogs(blogs.concat(returnedBlog))
-          setNewTitle(null)
-          setNewAuthor(null)
-          setNewUrl(null)
-          setNotificationMsg( {message: `Blogin ${newTitle} lisäys onnistui`, success: true} )
+          setNotificationMsg( {message: `Blogin lisäys onnistui`, success: true} )
           timeOut()
         })
         .catch(error => {
@@ -111,12 +88,40 @@ const App = () => {
         })
   }
 
+  const updateBlog = (id, blogObject) => {
+    blogService
+      .update(id, blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(b => b.id !== id ? b : returnedBlog))
+      })
+      .catch(error => {
+        setBlogs(blogs.filter(blog => blog.id !== id))
+        setNotificationMsg( {message: `Blogia ei enää löydy palvelimelta`, success: false} )
+        timeOut()
+      })
+  }
+
+  const deleteBlog = (id) => {
+    blogService
+      .del(id)
+      .then(() => {
+        setBlogs(blogs.filter(blog => blog.id !== id))
+        setNotificationMsg( {message: `Blogi poistettu`, success: true} )
+        timeOut()
+      })
+      .catch(error => {
+        setBlogs(blogs.filter(blog => blog.id !== id))
+        setNotificationMsg( {message: `Blogi on jo poistettu palvelimelta`, success: false} )
+        timeOut()
+      })
+  }
+
   const showBlogs = () => {
+    blogs.sort( (a, b) => a.likes >= b.likes ? -1 : 1 )
     return (
       blogs.map(blog =>
         {
-          console.log(blog)
-          return <Blog key={blog.id} blog={blog} />
+          return <Blog key={blog.id} blog={blog} user={user} updater={updateBlog} remover={deleteBlog}/>
         }
     )
   )}
@@ -153,7 +158,9 @@ const App = () => {
           <div>
             <h2>Blogs</h2>
             {showBlogs()}
-            {blogForm(addBlog)}
+            <Togglable buttonLabel="Luo uusi blogitieto" >
+              <BlogForm createBlog={addBlog} />
+            </Togglable>
           </div>
         </div>
       }
