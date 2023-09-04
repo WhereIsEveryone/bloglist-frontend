@@ -8,17 +8,17 @@ import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notificationMsg, setNotificationMsg] = useState({message: null, success: null})
+  const [notificationMsg, setNotificationMsg] = useState({ message: null, success: null })
 
   const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -43,11 +43,11 @@ const App = () => {
       blogService.setToken(user.token)
       setUsername('')
       setPassword('')
-      setNotificationMsg( {message: `Henkilö ${user.name} kirjattu sisään`, success: true} )
+      setNotificationMsg( { message: `Henkilö ${user.name} kirjattu sisään`, success: true } )
       timeOut()
     } catch (exception) {
-        setNotificationMsg( {message: `Väärä käyttäjätunnus ja/tai salasana`, success: false} )
-        timeOut()
+      setNotificationMsg( { message: 'Väärä käyttäjätunnus ja/tai salasana', success: false } )
+      timeOut()
     }
   }
 
@@ -55,7 +55,7 @@ const App = () => {
     <form onSubmit={handleLogin}>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -64,7 +64,7 @@ const App = () => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
@@ -72,23 +72,23 @@ const App = () => {
         />
       </div>
       <button type="submit">login</button>
-    </form>      
+    </form>
   )
 
   const addBlog = (blogObject) => {
     blogService
-        .create(blogObject)
-        .then(returnedBlog => {
-          setBlogs(blogs.concat(returnedBlog))
-          blogFormRef.current.toggleVisibility()
-          setNotificationMsg( {message: `Blogin lisäys onnistui`, success: true} )
-          timeOut()
-        })
-        .catch(error => {
-          console.log(error.response.data.error)
-          setNotificationMsg( {message: error.response.data.error, success: false} )
-          timeOut()
-        })
+      .create(blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        blogFormRef.current.toggleVisibility()
+        setNotificationMsg( { message: 'Blogin lisäys onnistui', success: true } )
+        timeOut()
+      })
+      .catch(error => {
+        console.log(error.response.data.error)
+        setNotificationMsg( { message: error.response.data.error, success: false } )
+        timeOut()
+      })
   }
 
   const updateBlog = (id, blogObject) => {
@@ -99,7 +99,7 @@ const App = () => {
       })
       .catch(error => {
         setBlogs(blogs.filter(blog => blog.id !== id))
-        setNotificationMsg( {message: `Blogia ei enää löydy palvelimelta`, success: false} )
+        setNotificationMsg( { message: 'Blogia ei enää löydy palvelimelta', success: false } )
         timeOut()
       })
   }
@@ -109,12 +109,12 @@ const App = () => {
       .del(id)
       .then(() => {
         setBlogs(blogs.filter(blog => blog.id !== id))
-        setNotificationMsg( {message: `Blogi poistettu`, success: true} )
+        setNotificationMsg( { message: 'Blogi poistettu', success: true } )
         timeOut()
       })
       .catch(error => {
         setBlogs(blogs.filter(blog => blog.id !== id))
-        setNotificationMsg( {message: `Blogi on jo poistettu palvelimelta`, success: false} )
+        setNotificationMsg( { message: 'Blogi on jo poistettu palvelimelta', success: false } )
         timeOut()
       })
   }
@@ -123,11 +123,11 @@ const App = () => {
     blogs.sort( (a, b) => a.likes >= b.likes ? -1 : 1 )
     return (
       blogs.map(blog =>
-        {
-          return <Blog key={blog.id} blog={blog} user={user} updater={updateBlog} remover={deleteBlog}/>
-        }
-    )
-  )}
+      {
+        return <Blog key={blog.id} blog={blog} user={user} updater={updateBlog} remover={deleteBlog}/>
+      }
+      )
+    )}
 
   const logoutButton = (handleClick) => (
     <button onClick={handleClick}>Logout</button>
@@ -140,20 +140,20 @@ const App = () => {
 
   const timeOut = () => {
     setTimeout(() => {
-      setNotificationMsg( {message: null, success: null} )
+      setNotificationMsg( { message: null, success: null } )
     }, 5000)
   }
 
   return (
     <div>
       <Notification notification={notificationMsg}/>
-      {!user && 
+      {!user &&
         <div>
           <h2>Log in to blog app</h2>
           {loginForm()}
-        </div>  
+        </div>
       }
-      {user && 
+      {user &&
         <div>
           <p>
             {user.name} logged in {logoutButton(handleLogout)}
