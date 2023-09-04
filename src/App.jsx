@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import BlogForm from './components/BlogForm'
@@ -12,6 +12,8 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notificationMsg, setNotificationMsg] = useState({message: null, success: null})
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -78,6 +80,7 @@ const App = () => {
         .create(blogObject)
         .then(returnedBlog => {
           setBlogs(blogs.concat(returnedBlog))
+          blogFormRef.current.toggleVisibility()
           setNotificationMsg( {message: `Blogin lisäys onnistui`, success: true} )
           timeOut()
         })
@@ -158,8 +161,8 @@ const App = () => {
           <div>
             <h2>Blogs</h2>
             {showBlogs()}
-            <Togglable buttonLabel="Luo uusi blogitieto" >
-              <BlogForm createBlog={addBlog} />
+            <Togglable buttonLabel="Luo uusi blogitieto" ref={blogFormRef}>
+              <BlogForm createBlog={addBlog} user={user} />
             </Togglable>
           </div>
         </div>
