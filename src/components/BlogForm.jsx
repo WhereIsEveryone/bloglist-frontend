@@ -22,9 +22,9 @@ const BlogForm = ( { createBlog } ) => {
   return (
     <form style={{ marginTop: 20 }} onSubmit={addBlog}>
       <div>
-            Title: <input value={newTitle} onChange={({ target }) => setNewTitle(target.value)} /> <br />
-            Author: <input value={newAuthor} onChange={({ target }) => setNewAuthor(target.value)} /> <br />
-            Url: <input value={newUrl} onChange={({ target }) => setNewUrl(target.value)} /> <br />
+            Title: <input value={newTitle} onChange={({ target }) => setNewTitle(target.value)} placeholder='Otsikko' /> <br />
+            Author: <input value={newAuthor} onChange={({ target }) => setNewAuthor(target.value)} placeholder='Kirjoittaja' /> <br />
+            Url: <input value={newUrl} onChange={({ target }) => setNewUrl(target.value)} placeholder='Url' /> <br />
         <button type="submit">Lisää</button>
       </div>
     </form>
