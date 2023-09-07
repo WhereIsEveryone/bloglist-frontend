@@ -26,7 +26,7 @@ const Blog = ({ blog, user, updater, remover }) => {
 
   if (!showAll) {
     return (
-      <div style={blogStyle}>
+      <div style={blogStyle} className="blog">
         {blog.title} <button onClick={() => setShowAll(true)}>Laajenna</button>
       </div>
     )
